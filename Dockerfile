@@ -26,4 +26,4 @@ COPY prisma/ ./prisma/
 COPY prisma.config.ts ./
 EXPOSE 3000
 WORKDIR /app/server
-CMD ["sh", "-c", "npx prisma migrate deploy && node dist/index.js"]
+CMD ["sh", "-c", "npx prisma migrate deploy --schema ../prisma/schema.prisma && node dist/index.js"]
