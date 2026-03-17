@@ -1,0 +1,112 @@
+generator client {
+  provider            = "prisma-client"
+  output              = "../generated/prisma"
+  importFileExtension = "ts"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String        @id @default(cuid())
+  clerkId          String        @unique
+  plan             Plan          @default(FREE)
+  stripeCustomerId String?       @unique
+  spaces           Space[]
+  memberships      SpaceMember[]
+  createdAt        DateTime      @default(now())
+}
+
+enum Plan {
+  FREE
+  PRO
+}
+
+model Space {
+  id        String        @id @default(cuid())
+  name      String
+  userId    String
+  user      User          @relation(fields: [userId], references: [id])
+  prompts   Prompt[]
+  members   SpaceMember[]
+  invites   SpaceInvite[]
+  createdAt DateTime      @default(now())
+
+  @@unique([name, userId])
+}
+
+model SpaceMember {
+  id        String    @id @default(cuid())
+  spaceId   String
+  space     Space     @relation(fields: [spaceId], references: [id])
+  userId    String
+  user      User      @relation(fields: [userId], references: [id])
+  role      SpaceRole @default(VIEWER)
+  createdAt DateTime  @default(now())
+
+  @@unique([spaceId, userId])
+}
+
+model SpaceInvite {
+  id        String       @id @default(cuid())
+  spaceId   String
+  space     Space        @relation(fields: [spaceId], references: [id])
+  email     String
+  role      SpaceRole    @default(VIEWER)
+  token     String       @unique
+  status    InviteStatus @default(PENDING)
+  expiresAt DateTime
+  createdAt DateTime     @default(now())
+}
+
+enum SpaceRole {
+  OWNER
+  EDITOR
+  VIEWER
+}
+
+enum InviteStatus {
+  PENDING
+  ACCEPTED
+  EXPIRED
+}
+
+model UsageEvent {
+  id        String   @id @default(cuid())
+  userId    String
+  promptId  String
+  site      String
+  action    String   @default("inject")
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([promptId])
+}
+
+model Prompt {
+  id        String          @id @default(cuid())
+  title     String
+  body      String
+  tags      String[]
+  spaceId   String
+  space     Space           @relation(fields: [spaceId], references: [id])
+  versions  PromptVersion[]
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+  deletedAt DateTime?
+}
+
+model PromptVersion {
+  id        String   @id @default(cuid())
+  promptId  String
+  prompt    Prompt   @relation(fields: [promptId], references: [id])
+  title     String
+  body      String
+  tags      String[]
+  version   Int
+  createdAt DateTime @default(now())
+
+  @@index([promptId, version])
+}

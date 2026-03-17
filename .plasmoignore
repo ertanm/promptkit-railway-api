@@ -1,0 +1,10 @@
+.env
+.env.local
+.env.production
+*.env
+server/
+node_modules/
+scripts/
+docs/
+*.md
+.git/

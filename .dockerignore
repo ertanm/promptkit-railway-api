@@ -1,0 +1,6 @@
+node_modules
+build
+.plasmo
+*.log
+.env
+.env.local
