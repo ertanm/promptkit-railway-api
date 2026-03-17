@@ -11,5 +11,7 @@ if [ -z "$DATABASE_URL" ]; then
   exit 1
 fi
 
+echo "Running database migrations..."
 cd /app && npx prisma migrate deploy
+echo "Starting API..."
 cd /app/server && exec node dist/index.js
