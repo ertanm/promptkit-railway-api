@@ -24,7 +24,8 @@ COPY --from=build /app/server/dist ./server/dist
 COPY --from=build /app/server/generated ./server/generated
 COPY prisma/ ./prisma/
 COPY prisma.config.ts ./
+COPY scripts/start.sh ./scripts/start.sh
+RUN chmod +x ./scripts/start.sh
 EXPOSE 3000
 WORKDIR /app/server
-# Run migrate from /app so prisma.config.ts is found (Prisma 7 requires it for datasource.url)
-CMD ["sh", "-c", "cd /app && npx prisma migrate deploy && cd server && node dist/index.js"]
+CMD ["/app/scripts/start.sh"]
