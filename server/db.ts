@@ -6,7 +6,7 @@ let _prisma: any = globalForPrisma.prisma ?? null
 
 async function initPrisma() {
   if (_prisma) return _prisma
-  const mod = await import("./generated/prisma/client.ts")
+  const mod = await import("./generated/prisma/client.js")
   const PrismaClient = mod.PrismaClient
   const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL })
   _prisma = new PrismaClient({ adapter, log: ["error", "warn"] })
