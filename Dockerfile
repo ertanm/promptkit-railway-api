@@ -14,19 +14,16 @@ COPY prisma.config.ts ./
 RUN cd server && npm ci
 COPY server/ ./server/
 RUN cd server && npx prisma generate
-RUN cd server && npx tsc --noEmit
+RUN cd server && npx tsc --outDir ./dist
 
 FROM base AS runner
 ENV NODE_ENV=production
-# node_modules at /app so generated Prisma client can resolve @prisma/client
 COPY --from=deps /app/server/node_modules ./node_modules
 COPY --from=deps /app/server/package.json ./server/package.json
-COPY server/ ./server/
+COPY --from=build /app/server/dist ./server/dist
+COPY --from=build /app/server/generated ./server/generated
 COPY prisma/ ./prisma/
 COPY prisma.config.ts ./
-COPY --from=build /app/server/generated ./server/generated
-
 EXPOSE 3000
 WORKDIR /app/server
-# Run migrations at startup (DATABASE_URL from Railway), then start the API
-CMD ["sh", "-c", "npx prisma migrate deploy && exec node --import tsx index.ts"]
+CMD ["sh", "-c", "npx prisma migrate deploy && node dist/index.js"]
