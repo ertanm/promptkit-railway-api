@@ -26,4 +26,5 @@ COPY prisma/ ./prisma/
 COPY prisma.config.ts ./
 EXPOSE 3000
 WORKDIR /app/server
-CMD ["sh", "-c", "npx prisma migrate deploy --schema ../prisma/schema.prisma && node dist/index.js"]
+# Run migrate from /app so prisma.config.ts is found (Prisma 7 requires it for datasource.url)
+CMD ["sh", "-c", "cd /app && npx prisma migrate deploy && cd server && node dist/index.js"]
