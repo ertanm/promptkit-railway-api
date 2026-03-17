@@ -1,12 +1,11 @@
 generator client {
   provider            = "prisma-client"
-  output              = "../generated/prisma"
+  output              = "../server/generated/prisma"
   importFileExtension = "ts"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 model User {
