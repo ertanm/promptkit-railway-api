@@ -7,7 +7,14 @@
   "manifest": {
     "content_security_policy": {
       "extension_pages": "script-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none';"
-    }
+    },
+    "host_permissions": [
+      "https://chat.openai.com/*",
+      "https://chatgpt.com/*",
+      "https://claude.ai/*",
+      "https://v0.dev/*",
+      "https://promptkit-railway-api-production.up.railway.app/*"
+    ]
   },
   "scripts": {
     "dev": "plasmo dev",
@@ -24,6 +31,8 @@
   },
   "dependencies": {
     "@clerk/chrome-extension": "^3.1.2",
+    "@fontsource/dm-mono": "^5.2.7",
+    "@fontsource/dm-sans": "^5.2.8",
     "@prisma/adapter-pg": "^7.5.0",
     "@prisma/client": "^7.5.0",
     "dotenv": "^17.3.1",

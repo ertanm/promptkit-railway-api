@@ -1,6 +1,7 @@
 import type { PlasmoCSConfig } from "plasmo"
 
 const isDevBuild = process.env.NODE_ENV !== "production"
+const apiUrl = process.env.PLASMO_PUBLIC_API_URL
 
 const baseHostPermissions = [
   "https://chat.openai.com/*",
@@ -9,10 +10,14 @@ const baseHostPermissions = [
   "https://v0.dev/*"
 ]
 
+const hostPermissions = isDevBuild
+  ? [...baseHostPermissions, "http://localhost:3000/*"]
+  : apiUrl
+    ? [...baseHostPermissions, `${apiUrl.replace(/\/+$/, "")}/*`]
+    : baseHostPermissions
+
 export const manifest: Partial<chrome.runtime.Manifest> = {
-  host_permissions: isDevBuild
-    ? [...baseHostPermissions, "http://localhost:3000/*"]
-    : baseHostPermissions,
+  host_permissions: hostPermissions,
   content_security_policy: {
     extension_pages:
       "script-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none';"
