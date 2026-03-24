@@ -1,5 +1,18 @@
 import { describe, expect, it, vi, beforeEach } from "vitest"
 
+const chromeStub = {
+  runtime: {
+    id: "test-extension-id",
+    onMessage: { addListener: vi.fn() },
+  },
+  tabs: {
+    query: vi.fn(),
+    sendMessage: vi.fn(),
+  },
+} as unknown as typeof chrome
+
+Object.assign(globalThis, { chrome: chromeStub })
+
 type Listener = Parameters<typeof chrome.runtime.onMessage.addListener>[0]
 
 describe("background message handler", () => {
@@ -46,7 +59,7 @@ describe("background message handler", () => {
     listener?.({ type: "INJECT_PROMPT", body: "ok" }, { id: chrome.runtime.id } as any, sendResponse)
 
     expect(sendResponse).toHaveBeenCalledWith({ ok: true })
-    expect(sendMessageSpy).toHaveBeenCalledWith(1, { type: "INJECT_PROMPT", body: "ok" })
+    expect(sendMessageSpy).toHaveBeenCalledWith(1, { type: "INJECT_PROMPT", body: "ok" }, expect.any(Function))
   })
 })
 

@@ -35,5 +35,5 @@ describe("injectText", () => {
     expect(paragraphs[1].textContent).toBe("second line")
     expect(div.querySelector("b")).toBeNull()
   })
-}
+})
 
