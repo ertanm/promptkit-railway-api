@@ -22,6 +22,11 @@ import {
   updateSpace,
 } from "~lib/api"
 import { clearAuth } from "~lib/auth"
+import {
+  getPersistedSelectedSpaceId,
+  getSessionIdentityForStorage,
+  setPersistedSelectedSpaceId,
+} from "~lib/last-space-selection"
 import "~style.css"
 
 type AppProps = {
@@ -57,9 +62,13 @@ export function App({ onSignOut }: AppProps) {
 
   const loadSpaces = useCallback(async (nextSelectedSpaceId?: string | null) => {
     const loadedSpaces = await fetchSpaces()
+    const userId = await getSessionIdentityForStorage()
+    const storedSpaceId = await getPersistedSelectedSpaceId(userId)
+
     setSpaces(loadedSpaces)
     if (loadedSpaces.length === 0) {
       setSelectedSpaceId(null)
+      await setPersistedSelectedSpaceId(userId, null)
       return
     }
     const currentSelection = selectedSpaceIdRef.current
@@ -67,7 +76,8 @@ export function App({ onSignOut }: AppProps) {
       nextSelectedSpaceId ??
       (currentSelection && loadedSpaces.some((space) => space.id === currentSelection)
         ? currentSelection
-        : null)
+        : null) ??
+      (storedSpaceId && loadedSpaces.some((space) => space.id === storedSpaceId) ? storedSpaceId : null)
     setSelectedSpaceId(preferredId ?? loadedSpaces[0].id)
   }, [])
 
@@ -103,6 +113,16 @@ export function App({ onSignOut }: AppProps) {
       }
     })()
   }, [loadPrompts, selectedSpaceId])
+
+  useEffect(() => {
+    if (!selectedSpaceId) {
+      return
+    }
+    void (async () => {
+      const userId = await getSessionIdentityForStorage()
+      await setPersistedSelectedSpaceId(userId, selectedSpaceId)
+    })()
+  }, [selectedSpaceId])
 
   const tagCounts = useMemo(() => {
     const counts = new Map<string, number>()
@@ -332,14 +352,14 @@ export function App({ onSignOut }: AppProps) {
                 <path
                   d="M9.5 12.5l2-2.5M11.5 14h2.5"
                   fill="none"
-                  stroke="var(--pv-accent)"
+                  stroke="var(--pv-primary-foreground)"
                   strokeWidth={2.2}
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 />
               </svg>
             </div>
-            <h1 className="text-sm font-semibold tracking-tight">PromptVault</h1>
+            <h1 className="text-sm font-bold tracking-[-0.02em] leading-[1.1]">PromptVault</h1>
           </div>
           <div className="min-w-0 flex-1">
             <SearchBar value={searchQuery} onChange={setSearchQuery} />
@@ -451,7 +471,9 @@ export function App({ onSignOut }: AppProps) {
 
           <div className="pv-scroll-hidden flex-1 space-y-3 overflow-y-auto px-4 py-4">
             {error && (
-              <div className="rounded-lg border border-red-400/30 bg-red-500/10 p-3 text-xs text-red-400">
+              <div
+                className="rounded-lg border border-[#F59E0B]/50 bg-[var(--pv-surface-muted)] p-3 text-xs text-[var(--pv-text)]"
+                role="alert">
                 {error}
               </div>
             )}
@@ -505,11 +527,11 @@ export function App({ onSignOut }: AppProps) {
               {filteredPrompts.length} prompt{filteredPrompts.length !== 1 ? "s" : ""}
             </span>
             <span className="flex items-center gap-1">
-              <kbd className="rounded border border-[var(--pv-border)] bg-[var(--pv-surface)] px-1 py-0.5 text-[9px]">
+              <kbd className="rounded border border-[var(--pv-border)] bg-[var(--pv-card)] px-1 py-0.5 text-[9px]">
                 ↑↓
               </kbd>
               navigate
-              <kbd className="ml-1 rounded border border-[var(--pv-border)] bg-[var(--pv-surface)] px-1 py-0.5 text-[9px]">
+              <kbd className="ml-1 rounded border border-[var(--pv-border)] bg-[var(--pv-card)] px-1 py-0.5 text-[9px]">
                 ↵
               </kbd>
               inject
@@ -542,35 +564,35 @@ export function App({ onSignOut }: AppProps) {
                 </button>
               </>
             }>
-            <div className="space-y-2">
-              <label className="block text-xs font-medium text-[var(--pv-text-muted)]">
+            <div className="space-y-5">
+              <label className="block text-sm font-medium text-[var(--pv-text)]">
                 Title
                 <input
                   type="text"
                   value={promptDraft.title}
                   onChange={(e) => setPromptDraft((current) => ({ ...current, title: e.target.value }))}
-                  className="pv-focus mt-1 h-9 w-full rounded-lg border border-[var(--pv-border)] bg-[var(--pv-surface)] px-3 text-xs text-[var(--pv-text)]"
+                  className="pv-input mt-2 max-h-9 py-2 text-xs"
                   maxLength={200}
                 />
               </label>
 
-              <label className="block text-xs font-medium text-[var(--pv-text-muted)]">
+              <label className="block text-sm font-medium text-[var(--pv-text)]">
                 Prompt body
                 <textarea
                   value={promptDraft.body}
                   onChange={(e) => setPromptDraft((current) => ({ ...current, body: e.target.value }))}
-                  className="pv-focus mt-1 h-28 w-full resize-none rounded-lg border border-[var(--pv-border)] bg-[var(--pv-surface)] px-3 py-2 text-xs text-[var(--pv-text)]"
+                  className="pv-input mt-2 min-h-[7rem] resize-none py-2 text-xs leading-relaxed"
                 />
               </label>
 
-              <label className="block text-xs font-medium text-[var(--pv-text-muted)]">
+              <label className="block text-sm font-medium text-[var(--pv-text)]">
                 Tags
                 <input
                   type="text"
                   value={promptDraft.tags}
                   onChange={(e) => setPromptDraft((current) => ({ ...current, tags: e.target.value }))}
                   placeholder="marketing, sales, outreach"
-                  className="pv-focus mt-1 h-9 w-full rounded-lg border border-[var(--pv-border)] bg-[var(--pv-surface)] px-3 text-xs text-[var(--pv-text)] placeholder:text-[var(--pv-text-muted)]"
+                  className="pv-input mt-2 max-h-9 py-2 text-xs placeholder:text-[var(--pv-text-dim)]"
                 />
               </label>
             </div>
@@ -602,14 +624,14 @@ export function App({ onSignOut }: AppProps) {
                 </button>
               </>
             }>
-            <label className="block text-xs font-medium text-[var(--pv-text-muted)]">
+            <label className="block text-sm font-medium text-[var(--pv-text)]">
               Space name
               <input
                 type="text"
                 value={spaceDraft.name}
                 onChange={(e) => setSpaceDraft((current) => ({ ...current, name: e.target.value }))}
                 maxLength={60}
-                className="pv-focus mt-1 h-9 w-full rounded-lg border border-[var(--pv-border)] bg-[var(--pv-surface)] px-3 text-xs text-[var(--pv-text)]"
+                className="pv-input mt-2 max-h-9 py-2 text-xs"
               />
             </label>
           </Modal>
@@ -633,7 +655,7 @@ export function App({ onSignOut }: AppProps) {
                 </button>
                 <button
                   type="button"
-                  className="pv-button pv-focus rounded-lg bg-red-600 px-3 py-2 text-xs font-medium text-white hover:bg-red-500"
+                  className="pv-button pv-focus rounded-lg bg-[#EF4444] px-3 py-2 text-xs font-medium text-white hover:bg-[#dc2626]"
                   onClick={handleDeleteConfirmed}
                   disabled={isDeleting}>
                   {isDeleting ? "Deleting..." : "Delete"}
