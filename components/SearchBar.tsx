@@ -28,7 +28,7 @@ export function SearchBar({ value, onChange }: SearchBarProps) {
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder="Search..."
-        className="pv-focus h-5 w-full rounded-md border border-transparent bg-[var(--pv-surface)] pl-6 pr-5 text-[10px] text-[var(--pv-text)] placeholder:text-[var(--pv-text-muted)] placeholder:opacity-60 transition-colors hover:border-[var(--pv-border)] focus:border-[var(--pv-border)]"
+        className="h-5 w-full rounded-md border border-transparent bg-[var(--pv-surface-muted)] pl-6 pr-5 text-[10px] text-[var(--pv-text)] outline-none transition-colors placeholder:text-[var(--pv-text-dim)] hover:border-[var(--pv-border)] focus:border-[#F59E0B] focus:ring-1 focus:ring-[#F59E0B]/30"
       />
       {value && (
         <button

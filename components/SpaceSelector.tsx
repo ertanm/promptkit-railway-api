@@ -25,7 +25,7 @@ export function SpaceSelector({ spaces, selectedId, onChange, className = "" }: 
       <select
         value={selectedId ?? ""}
         onChange={(e) => onChange(e.target.value || null)}
-        className="pv-focus h-8 w-full min-w-0 cursor-pointer appearance-none rounded-lg border border-[var(--pv-border)] bg-[var(--pv-surface)] pl-7.5 pr-7 text-xs font-medium text-[var(--pv-text)] transition-colors hover:border-[var(--pv-accent)]/40 hover:bg-[var(--pv-surface-muted)]"
+        className="h-8 w-full min-w-0 cursor-pointer appearance-none rounded-lg border border-[var(--pv-border)] bg-[var(--pv-surface-muted)] pl-7.5 pr-7 text-xs font-medium text-[var(--pv-text)] outline-none transition-colors hover:border-[#F59E0B]/40 focus:border-[#F59E0B] focus:ring-1 focus:ring-[#F59E0B]/30"
         style={{ paddingLeft: "1.75rem" }}>
         <option value="">All Spaces</option>
         {spaces.map((s) => (

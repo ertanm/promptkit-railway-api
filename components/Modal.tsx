@@ -14,10 +14,12 @@ export function Modal({ isOpen, title, description, children, onClose, footer }:
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 px-4 backdrop-blur-sm">
-      <div className="w-full max-w-sm rounded-2xl border border-[var(--pv-border)] bg-[var(--pv-surface)] p-4 shadow-2xl">
+      <div className="w-full max-w-sm rounded-xl border border-[var(--pv-border)] bg-[var(--pv-card)] p-4 shadow-2xl">
         <div className="mb-3 flex items-start justify-between gap-3">
           <div>
-            <h2 className="text-sm font-semibold text-[var(--pv-text)]">{title}</h2>
+            <h2 className="text-sm font-bold tracking-[-0.02em] leading-[1.1] text-[var(--pv-text)]">
+              {title}
+            </h2>
             {description && <p className="mt-1 text-xs text-[var(--pv-text-muted)]">{description}</p>}
           </div>
           <button

@@ -18,33 +18,28 @@
   font-display: swap;
 }
 
+/* PromptVault extension — dark-first, amber accent (see design system).
+   Variables on :root, html, and body so they always resolve in the popup document
+   (Plasmo popup is not shadow-DOM; missing inheritance was causing unset vars). */
 @layer base {
-  :root {
-    --pv-bg: #f6f2ea;
-    --pv-surface: #fffdfa;
-    --pv-surface-muted: #f6eee0;
-    --pv-border: #e5d8c2;
-    --pv-text: #20160b;
-    --pv-text-muted: #74624a;
-    --pv-accent: #b78b3f;
-    --pv-accent-strong: #a5792f;
-    --pv-accent-soft: #efe4d2;
-    --pv-danger: #dc2626;
-  }
-
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --pv-bg: #120f0b;
-      --pv-surface: #1f1912;
-      --pv-surface-muted: #18130e;
-      --pv-border: #3a3023;
-      --pv-text: #f9f3e9;
-      --pv-text-muted: #beab8f;
-      --pv-accent: #d5b06d;
-      --pv-accent-strong: #e1be82;
-      --pv-accent-soft: #302515;
-      --pv-danger: #f87171;
-    }
+  :root,
+  html,
+  body {
+    --pv-bg: #0c0a09;
+    --pv-card: #1c1917;
+    --pv-surface: #1c1917;
+    --pv-surface-muted: #292524;
+    --pv-border: #292524;
+    --pv-text: #fafaf9;
+    --pv-text-muted: #a8a29e;
+    --pv-text-dim: #57534e;
+    --pv-accent: #f59e0b;
+    --pv-accent-hover: #d97706;
+    --pv-accent-strong: #f59e0b;
+    --pv-accent-soft: rgba(245, 158, 11, 0.12);
+    --pv-primary-foreground: #000000;
+    --pv-danger: #ef4444;
+    --pv-success: #16a34a;
   }
 
   html,
@@ -59,24 +54,37 @@
   }
 
   body {
-    @apply font-sans antialiased;
+    @apply font-sans antialiased leading-relaxed;
     background:
-      radial-gradient(circle at 15% 10%, color-mix(in srgb, var(--pv-accent) 16%, transparent), transparent 42%),
-      radial-gradient(circle at 85% 90%, color-mix(in srgb, var(--pv-accent) 10%, transparent), transparent 38%),
+      radial-gradient(
+        circle at 15% 12%,
+        color-mix(in srgb, var(--pv-accent) 22%, transparent),
+        transparent 48%
+      ),
+      radial-gradient(
+        circle at 88% 88%,
+        color-mix(in srgb, var(--pv-accent) 14%, transparent),
+        transparent 44%
+      ),
+      radial-gradient(
+        ellipse 120% 80% at 50% 0%,
+        color-mix(in srgb, var(--pv-accent) 6%, transparent),
+        transparent 55%
+      ),
       var(--pv-bg);
     color: var(--pv-text);
   }
 }
 
-@layer utilities {
+@layer components {
   .pv-surface {
-    background: color-mix(in srgb, var(--pv-surface) 88%, transparent);
+    background: color-mix(in srgb, var(--pv-surface) 95%, transparent);
     border: 1px solid var(--pv-border);
     backdrop-filter: blur(10px);
   }
 
   .pv-surface-muted {
-    background: color-mix(in srgb, var(--pv-surface-muted) 90%, transparent);
+    background: color-mix(in srgb, var(--pv-surface-muted) 95%, transparent);
     border: 1px solid var(--pv-border);
     backdrop-filter: blur(8px);
   }
@@ -85,9 +93,30 @@
     color: var(--pv-text-muted);
   }
 
-  .pv-focus {
-    @apply focus:outline-none focus-visible:outline-none focus-visible:ring-2;
-    --tw-ring-color: color-mix(in srgb, var(--pv-accent) 52%, transparent);
+  /* Inputs: amber focus ring */
+  .pv-input {
+    @apply w-full rounded-lg border border-[var(--pv-border)] bg-[var(--pv-surface-muted)] px-4 py-2.5 text-sm text-[var(--pv-text)] transition-colors;
+  }
+
+  .pv-input::placeholder {
+    color: var(--pv-text-dim);
+  }
+
+  .pv-input:focus {
+    outline: none;
+    border-color: #f59e0b;
+    box-shadow: 0 0 0 1px rgba(245, 158, 11, 0.3);
+  }
+
+  .pv-input[aria-invalid="true"] {
+    border-color: var(--pv-danger);
+  }
+
+  /* Buttons & icon controls */
+  .pv-focus:focus-visible {
+    outline: none;
+    border-color: #f59e0b;
+    box-shadow: 0 0 0 1px rgba(245, 158, 11, 0.3);
   }
 
   .pv-button {
@@ -95,45 +124,80 @@
   }
 
   .pv-button:disabled {
-    opacity: 0.55;
-    cursor: not-allowed;
+    @apply cursor-not-allowed opacity-80;
   }
 
   .pv-button-primary {
-    @apply pv-button text-white;
+    @apply pv-button relative z-[1] text-[var(--pv-primary-foreground)];
     background: var(--pv-accent);
-    box-shadow: 0 8px 24px color-mix(in srgb, var(--pv-accent) 26%, transparent);
+    box-shadow: 0 8px 24px color-mix(in srgb, var(--pv-accent) 28%, transparent);
   }
 
-  .pv-button-primary:hover {
-    background: var(--pv-accent-strong);
+  .pv-button-primary:hover:not(:disabled) {
+    background: var(--pv-accent-hover);
+    color: var(--pv-primary-foreground);
   }
 
   .pv-button-ghost {
-    @apply pv-button;
-    background: transparent;
-    color: var(--pv-text-muted);
-    border: 1px solid var(--pv-border);
+    @apply pv-button border border-[var(--pv-border)] bg-transparent text-[var(--pv-text-muted)];
   }
 
-  .pv-button-ghost:hover {
+  .pv-button-ghost:hover:not(:disabled) {
     color: var(--pv-text);
     background: color-mix(in srgb, var(--pv-surface-muted) 100%, transparent);
   }
 
   .pv-icon-button {
-    @apply inline-flex items-center justify-center rounded-md p-1.5 transition-colors;
+    @apply inline-flex items-center justify-center rounded-lg p-1.5 transition-colors;
     color: var(--pv-text-muted);
   }
 
-  .pv-icon-button:hover {
+  .pv-icon-button:hover:not(:disabled) {
     color: var(--pv-text);
     background: color-mix(in srgb, var(--pv-surface-muted) 100%, transparent);
   }
 
   .pv-icon-button:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
+    @apply cursor-not-allowed opacity-80;
+  }
+
+  /* Wrapper only sizes the row; shimmer lives on the button to avoid a visible “frame”
+     from overflow + rounded corners on an outer box. */
+  .shimmer-button {
+    display: block;
+    width: 100%;
+  }
+
+  .shimmer-button > .pv-button-primary {
+    overflow: hidden;
+  }
+
+  .shimmer-button > .pv-button-primary::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    border-radius: inherit;
+    transform: translateX(-100%);
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(253, 230, 138, 0.32),
+      transparent
+    );
+    animation: pv-shimmer 2.2s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  .shimmer-button > .pv-button-primary > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  @keyframes pv-shimmer {
+    100% {
+      transform: translateX(100%);
+    }
   }
 
   .pv-scroll-hidden {
