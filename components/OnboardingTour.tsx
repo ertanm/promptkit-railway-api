@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react"
+import { getToken, getUserIdFromToken } from "~lib/auth"
+import { markOnboardingCompleteForUser, shouldShowOnboardingTour } from "~lib/onboarding"
 
 const TOUR_STEPS = [
   {
@@ -18,31 +20,41 @@ const TOUR_STEPS = [
   },
 ]
 
-const STORAGE_KEY = "pv_onboarding_complete"
-
 export function OnboardingTour() {
   const [step, setStep] = useState(0)
   const [visible, setVisible] = useState(false)
 
   useEffect(() => {
-    chrome.storage?.local?.get(STORAGE_KEY, (result) => {
-      if (!result[STORAGE_KEY]) {
+    let cancelled = false
+    void (async () => {
+      const token = await getToken()
+      if (!token || cancelled) {
+        return
+      }
+      const userId = getUserIdFromToken(token)
+      const show = await shouldShowOnboardingTour(userId)
+      if (!cancelled && show) {
         setVisible(true)
       }
-    })
+    })()
+    return () => {
+      cancelled = true
+    }
   }, [])
 
   const handleNext = () => {
     if (step < TOUR_STEPS.length - 1) {
       setStep(step + 1)
     } else {
-      handleDismiss()
+      void dismissTour()
     }
   }
 
-  const handleDismiss = () => {
+  const dismissTour = async () => {
+    const token = await getToken()
+    const userId = token ? getUserIdFromToken(token) : null
+    await markOnboardingCompleteForUser(userId)
     setVisible(false)
-    chrome.storage?.local?.set({ [STORAGE_KEY]: true })
   }
 
   if (!visible) return null
@@ -51,12 +63,18 @@ export function OnboardingTour() {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-      <div className="w-[320px] rounded-2xl border border-[var(--pv-border)] bg-[color:color-mix(in_srgb,var(--pv-surface)_88%,transparent)] p-6 shadow-2xl backdrop-blur-md">
-        <div className="text-center mb-4">
+      <div
+        className="w-[320px] rounded-xl border border-[var(--pv-border)] bg-[var(--pv-card)] p-8 shadow-2xl backdrop-blur-md"
+        style={{ boxShadow: "0 0 80px -30px rgba(245, 158, 11, 0.08), 0 25px 50px -12px rgba(0, 0, 0, 0.45)" }}>
+        <div className="mb-4 text-center">
           <span className="text-4xl">{current.icon}</span>
         </div>
-        <h2 className="mb-2 text-center text-lg font-semibold text-[var(--pv-text)]">{current.title}</h2>
-        <p className="mb-6 text-center text-sm text-[var(--pv-text-muted)]">{current.description}</p>
+        <h2 className="mb-2 text-center text-lg font-bold tracking-[-0.02em] leading-[1.1] text-[var(--pv-text)]">
+          {current.title}
+        </h2>
+        <p className="mb-6 text-center text-sm leading-relaxed text-[var(--pv-text-muted)]">
+          {current.description}
+        </p>
 
         <div className="flex items-center justify-between">
           <div className="flex gap-1.5">
@@ -72,14 +90,14 @@ export function OnboardingTour() {
           <div className="flex gap-2">
             <button
               type="button"
-              onClick={handleDismiss}
+              onClick={() => void dismissTour()}
               className="px-3 py-1.5 text-xs text-[var(--pv-text-muted)] transition-colors hover:text-[var(--pv-text)]">
               Skip
             </button>
             <button
               type="button"
               onClick={handleNext}
-              className="rounded-lg bg-[var(--pv-accent)] px-4 py-1.5 text-xs font-medium text-white transition-colors hover:bg-[var(--pv-accent-strong)]">
+              className="rounded-lg bg-[var(--pv-accent)] px-4 py-1.5 text-xs font-medium text-[var(--pv-primary-foreground)] transition-colors hover:bg-[var(--pv-accent-hover)]">
               {step < TOUR_STEPS.length - 1 ? "Next" : "Get Started"}
             </button>
           </div>
