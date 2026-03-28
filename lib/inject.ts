@@ -1,5 +1,7 @@
 import type { SiteConfig } from "./sites.config"
 
+export type InjectResult = { ok: true } | { ok: false; details: string }
+
 export function findInputElement(config: SiteConfig): HTMLElement | null {
   const selectors = [config.inputSelector, ...(config.fallbackSelectors ?? [])]
   for (const selector of selectors) {
@@ -9,18 +11,15 @@ export function findInputElement(config: SiteConfig): HTMLElement | null {
   return null
 }
 
-export function injectText(element: HTMLElement, text: string, inputType: SiteConfig["inputType"]) {
+export function injectText(element: HTMLElement, text: string, inputType: SiteConfig["inputType"]): InjectResult {
   const resolvedType = resolveInputType(element, inputType)
   switch (resolvedType) {
     case "textarea":
-      injectIntoTextarea(element as HTMLTextAreaElement, text)
-      break
+      return injectIntoTextarea(element as HTMLTextAreaElement, text)
     case "contenteditable":
-      injectIntoContentEditable(element, text)
-      break
+      return injectIntoContentEditable(element, text)
     case "prosemirror":
-      injectIntoProseMirror(element, text)
-      break
+      return injectIntoProseMirror(element, text)
   }
 }
 
@@ -32,33 +31,55 @@ function resolveInputType(el: HTMLElement, configured: SiteConfig["inputType"]):
   return configured
 }
 
-function injectIntoTextarea(el: HTMLTextAreaElement, text: string) {
+function injectIntoTextarea(el: HTMLTextAreaElement, text: string): InjectResult {
   el.focus()
   el.value = text
   el.dispatchEvent(new Event("input", { bubbles: true }))
   el.dispatchEvent(new Event("change", { bubbles: true }))
   el.setSelectionRange(text.length, text.length)
+  return { ok: true }
 }
 
-function injectIntoContentEditable(el: HTMLElement, text: string) {
+function injectIntoContentEditable(el: HTMLElement, text: string): InjectResult {
   el.focus()
-  // Select all so insertText replaces content; works better with ProseMirror/React
+  selectAllContents(el)
+  const inserted = document.execCommand?.("insertText", false, text)
+  if (inserted) {
+    placeCaretAtEnd(el)
+    return { ok: true }
+  }
+  // Fallback: synthetic paste event — lets React/ProseMirror reconcile via their paste handler
+  const pasted = dispatchSyntheticPaste(el, text)
+  if (pasted) {
+    placeCaretAtEnd(el)
+    return { ok: true }
+  }
+  return { ok: false, details: "execCommand and paste fallback both failed on contenteditable" }
+}
+
+function injectIntoProseMirror(el: HTMLElement, text: string): InjectResult {
+  el.focus()
+  selectAllContents(el)
+  const inserted = document.execCommand?.("insertText", false, text)
+  if (inserted) {
+    placeCaretAtEnd(el)
+    return { ok: true }
+  }
+  // Fallback: synthetic paste event — ProseMirror's paste handler updates EditorState correctly
+  const pasted = dispatchSyntheticPaste(el, text)
+  if (pasted) {
+    placeCaretAtEnd(el)
+    return { ok: true }
+  }
+  return { ok: false, details: "execCommand and paste fallback both failed on ProseMirror" }
+}
+
+function selectAllContents(el: HTMLElement) {
   const range = document.createRange()
   range.selectNodeContents(el)
   const selection = window.getSelection()
   selection?.removeAllRanges()
   selection?.addRange(range)
-  const inserted = document.execCommand?.("insertText", false, text)
-  if (inserted) {
-    placeCaretAtEnd(el)
-    return
-  }
-  // Fallback: direct DOM + input event
-  el.textContent = ""
-  const textNode = document.createTextNode(text)
-  el.appendChild(textNode)
-  el.dispatchEvent(new InputEvent("input", { bubbles: true, inputType: "insertText", data: text }))
-  placeCaretAtEnd(el)
 }
 
 function placeCaretAtEnd(el: HTMLElement) {
@@ -70,28 +91,21 @@ function placeCaretAtEnd(el: HTMLElement) {
   selection?.addRange(range)
 }
 
-function injectIntoProseMirror(el: HTMLElement, text: string) {
-  el.focus()
-  const range = document.createRange()
-  range.selectNodeContents(el)
-  const selection = window.getSelection()
-  selection?.removeAllRanges()
-  selection?.addRange(range)
-  const inserted = document.execCommand?.("insertText", false, text)
-  if (inserted) {
-    placeCaretAtEnd(el)
-    return
-  }
-  // Fallback: direct DOM + paragraphs
-  while (el.firstChild) {
-    el.removeChild(el.firstChild)
-  }
-  const paragraphs = text.split("\n")
-  for (const paragraph of paragraphs) {
-    const p = document.createElement("p")
-    p.textContent = paragraph
-    el.appendChild(p)
-  }
-  el.dispatchEvent(new InputEvent("input", { bubbles: true, inputType: "insertText", data: text }))
-  placeCaretAtEnd(el)
+/**
+ * Dispatches a synthetic paste event with a DataTransfer containing the text.
+ * React and ProseMirror both listen for paste events and update their internal
+ * state through the clipboard handler — unlike raw DOM mutations, this keeps
+ * the framework state in sync.
+ */
+function dispatchSyntheticPaste(el: HTMLElement, text: string): boolean {
+  const dt = new DataTransfer()
+  dt.setData("text/plain", text)
+  const pasteEvent = new ClipboardEvent("paste", {
+    bubbles: true,
+    cancelable: true,
+    clipboardData: dt,
+  })
+  // If the paste event is cancelled (preventDefault called), the framework handled it
+  const cancelled = !el.dispatchEvent(pasteEvent)
+  return cancelled
 }

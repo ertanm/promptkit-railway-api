@@ -15,6 +15,9 @@ export const config: PlasmoCSConfig = {
 
 const siteConfig = findSiteConfig(window.location.hostname)
 
+/** Match server-side limit (server/schemas.ts allows 20 000 chars). */
+const MAX_BODY_LENGTH = 20000
+
 type InjectPromptMessage = {
   type: "INJECT_PROMPT"
   body: string
@@ -27,19 +30,21 @@ function isInjectPromptMessage(message: unknown): message is InjectPromptMessage
     (message as { type?: unknown }).type === "INJECT_PROMPT" &&
     typeof (message as { body?: unknown }).body === "string" &&
     (message as { body: string }).body.length > 0 &&
-    (message as { body: string }).body.length <= 10000
+    (message as { body: string }).body.length <= MAX_BODY_LENGTH
   )
 }
 
-let observer: MutationObserver | null = null
+const OBSERVER_FLAG = "data-injectkit-observer"
 
 function setupObserver() {
-  if (observer || !siteConfig) return
+  // Prevent duplicate observers when the content script is re-injected
+  if (!siteConfig || document.body.hasAttribute(OBSERVER_FLAG)) return
+  document.body.setAttribute(OBSERVER_FLAG, "true")
 
-  observer = new MutationObserver(() => {
+  const observer = new MutationObserver(() => {
     const input = findInputElement(siteConfig)
     if (input) {
-      input.dataset.promptvaultReady = "true"
+      input.dataset.injectkitReady = "true"
     }
   })
 
@@ -49,20 +54,29 @@ function setupObserver() {
   })
 }
 
-function handleInjectMessage(message: unknown, sender: chrome.runtime.MessageSender) {
+function handleInjectMessage(
+  message: unknown,
+  sender: chrome.runtime.MessageSender,
+  sendResponse: (response: { ok: boolean; details?: string }) => void,
+): boolean {
   if (sender.id !== chrome.runtime.id) {
-    return
+    return false
   }
 
-  if (!siteConfig || !isInjectPromptMessage(message)) return
+  if (!siteConfig || !isInjectPromptMessage(message)) {
+    sendResponse({ ok: false, details: "Invalid message or unsupported site" })
+    return false
+  }
 
   const input = findInputElement(siteConfig)
   if (!input) {
-    console.warn("[PromptVault] Could not find input element on", siteConfig.name)
-    return
+    sendResponse({ ok: false, details: `Could not find input element on ${siteConfig.name}` })
+    return false
   }
 
-  injectText(input, message.body, siteConfig.inputType)
+  const result = injectText(input, message.body, siteConfig.inputType)
+  sendResponse(result)
+  return false
 }
 
 if (siteConfig) {

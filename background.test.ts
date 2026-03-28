@@ -4,10 +4,15 @@ const chromeStub = {
   runtime: {
     id: "test-extension-id",
     onMessage: { addListener: vi.fn() },
+    getManifest: vi.fn(() => ({ content_scripts: [] })),
   },
   tabs: {
     query: vi.fn(),
     sendMessage: vi.fn(),
+    update: vi.fn((_id: number, _props: any, cb?: () => void) => cb?.()),
+  },
+  windows: {
+    update: vi.fn((_id: number, _props: any, cb?: () => void) => cb?.()),
   },
 } as unknown as typeof chrome
 
@@ -19,7 +24,6 @@ describe("background message handler", () => {
   let listener: Listener
 
   beforeEach(async () => {
-    // Reload the background module to re-register the listener
     vi.resetModules()
     const onMessageSpy = vi.fn<(cb: Listener) => void>((cb) => {
       listener = cb
@@ -46,19 +50,25 @@ describe("background message handler", () => {
     expect(sendResponse).toHaveBeenCalledWith({ ok: false, error: "invalid_message" })
   })
 
-  it("accepts a valid INJECT_PROMPT message from this extension", () => {
+  it("accepts a valid INJECT_PROMPT message and forwards content script response", async () => {
     const sendResponse = vi.fn()
-    const querySpy = vi.fn((_query, cb: (tabs: Array<{ id: number }>) => void) => {
-      cb([{ id: 1 }])
+    const contentScriptResponse = { ok: true }
+    const querySpy = vi.fn((_query: any, cb: (tabs: Array<{ id: number; windowId: number; active: boolean }>) => void) => {
+      cb([{ id: 1, windowId: 10, active: true }])
     })
-    const sendMessageSpy = vi.fn()
+    const sendMessageSpy = vi.fn((_tabId: number, _msg: any, cb: (response: any) => void) => {
+      cb(contentScriptResponse)
+    })
 
     ;(chrome.tabs.query as unknown as typeof querySpy) = querySpy as any
     ;(chrome.tabs.sendMessage as unknown as typeof sendMessageSpy) = sendMessageSpy as any
 
     listener?.({ type: "INJECT_PROMPT", body: "ok" }, { id: chrome.runtime.id } as any, sendResponse)
 
-    expect(sendResponse).toHaveBeenCalledWith({ ok: true })
+    // Wait for async focusTab + trySend chain
+    await vi.waitFor(() => {
+      expect(sendResponse).toHaveBeenCalledWith(contentScriptResponse)
+    })
     expect(sendMessageSpy).toHaveBeenCalledWith(1, { type: "INJECT_PROMPT", body: "ok" }, expect.any(Function))
   })
 })
