@@ -6,7 +6,7 @@ export function onboardingDoneKeyForUser(userId: string): string {
 }
 
 /**
- * Whether to show the “how PromptVault works” tour for this account.
+ * Whether to show the “how InjectKit works” tour for this account.
  * Uses one key per `userId` so logging out and back in does not replay the tour.
  * Migrates `LEGACY_ONBOARDING_COMPLETE_KEY` → per-user when present.
  */

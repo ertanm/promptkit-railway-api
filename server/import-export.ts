@@ -93,7 +93,7 @@ importExportRouter.get("/api/prompts/export", async (req: Request, res: Response
         ].join(",")
       })
       res.setHeader("Content-Type", "text/csv")
-      res.setHeader("Content-Disposition", "attachment; filename=promptvault-export.csv")
+      res.setHeader("Content-Disposition", "attachment; filename=injectkit-export.csv")
       return res.send(header + rows.join("\n"))
     }
 
@@ -105,7 +105,7 @@ importExportRouter.get("/api/prompts/export", async (req: Request, res: Response
       createdAt: p.createdAt,
     }))
     res.setHeader("Content-Type", "application/json")
-    res.setHeader("Content-Disposition", "attachment; filename=promptvault-export.json")
+    res.setHeader("Content-Disposition", "attachment; filename=injectkit-export.json")
     return res.json(exportData)
   } catch (err) {
     if (err instanceof AuthError) return res.status(401).json({ error: err.message })

@@ -1,9 +1,9 @@
 import type { Space, Prompt } from "./api"
 
 const STORAGE_KEYS = {
-  SPACES: "promptvault:spaces",
-  PROMPTS: "promptvault:prompts",
-  LAST_SYNC: "promptvault:last_sync",
+  SPACES: "injectkit:spaces",
+  PROMPTS: "injectkit:prompts",
+  LAST_SYNC: "injectkit:last_sync",
 } as const
 
 function getStorage(): typeof chrome.storage.local | null {

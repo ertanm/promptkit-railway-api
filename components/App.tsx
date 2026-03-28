@@ -343,23 +343,15 @@ export function App({ onSignOut }: AppProps) {
       <div className="shrink-0 border-b border-[var(--pv-border)] px-4 pb-4 pt-4">
         <div className="mb-3 flex items-center gap-2">
           <div className="flex shrink-0 items-center gap-2">
-            <div className="flex h-6 w-6 items-center justify-center rounded-md bg-[var(--pv-accent)] shadow-sm shadow-[color-mix(in_srgb,var(--pv-accent)_30%,transparent)]">
-              <svg className="h-3.5 w-3.5" viewBox="0 0 24 24">
-                <path
-                  fill="white"
-                  d="M12 2.5l8 3.5v5c0 5.25-3.4 10.2-8 11.5C7.4 21.2 4 16.25 4 11V6l8-3.5z"
-                />
-                <path
-                  d="M9.5 12.5l2-2.5M11.5 14h2.5"
-                  fill="none"
-                  stroke="var(--pv-primary-foreground)"
-                  strokeWidth={2.2}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
+            <div className="flex h-6 w-6 items-center justify-center rounded-[6px] bg-[#1c1917] shadow-sm shadow-[color-mix(in_srgb,var(--pv-accent)_30%,transparent)]">
+              <svg className="h-4 w-4" viewBox="0 0 128 128" fill="none">
+                <path d="M38 36 L26 64 L38 92" stroke="#f59e0b" strokeWidth={12} strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M90 36 L102 64 L90 92" stroke="#f59e0b" strokeWidth={12} strokeLinecap="round" strokeLinejoin="round"/>
+                <line x1="46" y1="64" x2="74" y2="64" stroke="#fbbf24" strokeWidth={12} strokeLinecap="round"/>
+                <path d="M67 53 L80 64 L67 75" stroke="#fbbf24" strokeWidth={12} strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </div>
-            <h1 className="text-sm font-bold tracking-[-0.02em] leading-[1.1]">PromptVault</h1>
+            <h1 className="text-sm font-bold tracking-[-0.02em] leading-[1.1]">InjectKit</h1>
           </div>
           <div className="min-w-0 flex-1">
             <SearchBar value={searchQuery} onChange={setSearchQuery} />
@@ -486,7 +478,7 @@ export function App({ onSignOut }: AppProps) {
                 message={
                   searchQuery
                     ? `No prompts match "${searchQuery}"`
-                    : "Create your first prompt to start using PromptVault."
+                    : "Create your first prompt to start using InjectKit."
                 }
                 onAction={() => {
                   if (!selectedSpaceId) {

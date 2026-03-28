@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest"
 
 const root = path.resolve(__dirname, "../..")
 
-describe("PromptVault popup source (design tokens & entry)", () => {
+describe("InjectKit popup source (design tokens & entry)", () => {
   it("imports global styles before any React component in popup.tsx", () => {
     const src = fs.readFileSync(path.join(root, "popup.tsx"), "utf8")
     const firstImport = src

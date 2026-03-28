@@ -87,7 +87,7 @@ function main() {
     const content = fs.readFileSync(path.join(buildDir, file), "utf8")
     if (content.includes("http://localhost:3000")) {
       fail(
-        "Production build contains localhost API URL. Set PLASMO_PUBLIC_API_URL to your HTTPS API (e.g. https://api.promptvault.com) and rebuild."
+        "Production build contains localhost API URL. Set PLASMO_PUBLIC_API_URL to your HTTPS API (e.g. https://api.injectkit.dev) and rebuild."
       )
     }
   }

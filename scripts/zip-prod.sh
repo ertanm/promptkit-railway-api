@@ -2,7 +2,7 @@
 set -e
 
 BUILD_DIR="build/chrome-mv3-prod"
-OUTPUT="promptvault-extension.zip"
+OUTPUT="injectkit-extension.zip"
 
 if [ ! -d "$BUILD_DIR" ]; then
   echo "ERROR: $BUILD_DIR does not exist. Run yarn build:prod first."

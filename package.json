@@ -1,17 +1,17 @@
 {
   "name": "promptextension",
-  "displayName": "PromptVault",
-  "version": "0.1.0",
+  "displayName": "InjectKit",
+  "version": "1.0.0",
   "description": "Save, organize, and inject AI prompts into any chat interface.",
   "author": "Highpriesst",
   "manifest": {
     "commands": {
-      "open-promptvault": {
+      "open-injectkit": {
         "suggested_key": {
           "default": "Ctrl+K",
           "mac": "Command+K"
         },
-        "description": "Open PromptVault"
+        "description": "Open InjectKit"
       }
     },
     "permissions": ["storage", "scripting"],
@@ -38,7 +38,7 @@
     "build:all": "plasmo build && plasmo build --target=firefox-mv2",
     "verify:manifest": "ts-node scripts/verify-prod-manifest.ts",
     "verify:prod-manifest": "ts-node scripts/verify-prod-manifest.ts",
-    "verify:popup-prod": "vitest run popup/__tests__/promptvault-popup-prod.test.ts",
+    "verify:popup-prod": "vitest run popup/__tests__/injectkit-popup-prod.test.ts",
     "verify:extension": "npm run build:prod && npm run test && npm run verify:manifest",
     "test": "vitest run",
     "test:watch": "vitest",

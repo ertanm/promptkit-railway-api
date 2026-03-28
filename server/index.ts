@@ -11,7 +11,7 @@ async function start() {
   await initPrisma()
   const port = env.PORT ?? 3000
   app.listen(port, () => {
-    console.log(`PromptVault API running on port ${port}`)
+    console.log(`InjectKit API running on port ${port}`)
   })
 }
 

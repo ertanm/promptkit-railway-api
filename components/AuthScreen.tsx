@@ -88,10 +88,10 @@ export function AuthScreen({ onSuccess }: AuthScreenProps) {
     <div className="flex h-[600px] w-[400px] flex-col items-center justify-center overflow-hidden bg-[var(--pv-bg)] px-6">
       <div className="mb-8 w-full max-w-[340px] text-center">
         <h1 className="text-2xl font-bold tracking-[-0.02em] leading-[1.1] text-[var(--pv-text)]">
-          PromptVault
+          InjectKit
         </h1>
         <p className="mt-2 text-sm text-[var(--pv-text-dim)]">
-          {mode === "signin" ? "Sign in to continue to your vault" : "Create your account"}
+          {mode === "signin" ? "Sign in to continue" : "Create your account"}
         </p>
       </div>
 

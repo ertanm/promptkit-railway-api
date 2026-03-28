@@ -21,15 +21,15 @@ For further guidance, [visit our Documentation](https://docs.plasmo.com/)
 **Required:** Set `PLASMO_PUBLIC_API_URL` to your production HTTPS API before building:
 
 ```bash
-export PLASMO_PUBLIC_API_URL=https://api.promptvault.com  # your API URL
+export PLASMO_PUBLIC_API_URL=https://api.injectkit.dev  # your API URL
 pnpm build:prod
 # or
-PLASMO_PUBLIC_API_URL=https://api.promptvault.com npm run build:prod
+PLASMO_PUBLIC_API_URL=https://api.injectkit.dev npm run build:prod
 ```
 
 Or add to `.env.production`:
 ```
-PLASMO_PUBLIC_API_URL=https://api.promptvault.com
+PLASMO_PUBLIC_API_URL=https://api.injectkit.dev
 ```
 
 Then run `pnpm build` (Plasmo loads `.env.production` when `NODE_ENV=production`).

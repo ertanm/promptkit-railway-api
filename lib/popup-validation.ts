@@ -6,13 +6,13 @@
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
-export type PromptVaultUser = {
+export type InjectKitUser = {
   id: string
   email: string
   plan: "free" | "pro"
 }
 
-export function parsePromptVaultUser(data: unknown): PromptVaultUser | null {
+export function parseInjectKitUser(data: unknown): InjectKitUser | null {
   if (typeof data !== "object" || data === null) {
     return null
   }

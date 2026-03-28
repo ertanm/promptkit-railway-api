@@ -7,7 +7,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: promptvault
+      POSTGRES_DB: injectkit
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -37,7 +37,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      DATABASE_URL: postgresql://postgres:postgres@db:5432/promptvault?schema=public
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/injectkit?schema=public
       REDIS_URL: redis://redis:6379
       CORS_ORIGINS: https://yourdomain.com,chrome-extension://YOUR_EXTENSION_ID
       NODE_ENV: production

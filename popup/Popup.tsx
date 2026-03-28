@@ -33,7 +33,7 @@ export function Popup() {
   const handleSignOut = useCallback(async () => {
     await clearToken()
     try {
-      await chrome.storage.local.remove("promptvault_user")
+      await chrome.storage.local.remove("injectkit_user")
     } catch {
       // ignore
     }

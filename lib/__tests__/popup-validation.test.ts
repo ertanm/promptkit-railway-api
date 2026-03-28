@@ -1,21 +1,21 @@
 import { describe, expect, it } from "vitest"
 import {
-  parsePromptVaultUser,
+  parseInjectKitUser,
   validateLoginForm,
   validateSignupForm,
 } from "../popup-validation"
 
-describe("parsePromptVaultUser", () => {
+describe("parseInjectKitUser", () => {
   it("accepts a valid /me-shaped object", () => {
     expect(
-      parsePromptVaultUser({ id: "u1", email: "a@b.co", plan: "free" })
+      parseInjectKitUser({ id: "u1", email: "a@b.co", plan: "free" })
     ).toEqual({ id: "u1", email: "a@b.co", plan: "free" })
   })
 
   it("rejects invalid plan or types", () => {
-    expect(parsePromptVaultUser({ id: "u1", email: "a@b.co", plan: "team" })).toBeNull()
-    expect(parsePromptVaultUser({ id: 1, email: "a@b.co", plan: "free" })).toBeNull()
-    expect(parsePromptVaultUser(null)).toBeNull()
+    expect(parseInjectKitUser({ id: "u1", email: "a@b.co", plan: "team" })).toBeNull()
+    expect(parseInjectKitUser({ id: 1, email: "a@b.co", plan: "free" })).toBeNull()
+    expect(parseInjectKitUser(null)).toBeNull()
   })
 })
 

@@ -12,7 +12,7 @@ describe("Legal and billing landing pages", () => {
     const res = await request(app).get("/privacy")
     expect(res.status).toBe(200)
     expect(res.headers["content-type"]).toMatch(/html/)
-    expect(res.text).toMatch(/Privacy Policy|PromptVault/)
+    expect(res.text).toMatch(/Privacy Policy|InjectKit/)
   })
 
   it("serves terms of service as HTML", async () => {

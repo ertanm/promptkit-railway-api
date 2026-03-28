@@ -19,7 +19,7 @@ async function main() {
     create: { email: "dev@localhost", passwordHash },
     update: {},
   })
-  console.log("Seeded dev user for PromptVault (dev@localhost / devpassword)")
+  console.log("Seeded dev user for InjectKit (dev@localhost / devpassword)")
 
   const spaces = await Promise.all(
     ["General", "Code Review", "Creative Writing"].map((name) =>

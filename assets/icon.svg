@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- Dark background -->
+  <rect width="128" height="128" rx="28" fill="#0c0a09"/>
+  <!-- Subtle inner glow -->
+  <rect x="2" y="2" width="124" height="124" rx="26" fill="#1c1917"/>
+  <!-- Left angle bracket -->
+  <path d="M38 36 L26 64 L38 92" stroke="#f59e0b" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <!-- Right angle bracket -->
+  <path d="M90 36 L102 64 L90 92" stroke="#f59e0b" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <!-- Arrow shaft -->
+  <line x1="46" y1="64" x2="74" y2="64" stroke="#fbbf24" stroke-width="7" stroke-linecap="round"/>
+  <!-- Arrow head -->
+  <path d="M67 53 L80 64 L67 75" stroke="#fbbf24" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

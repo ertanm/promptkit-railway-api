@@ -18,7 +18,7 @@
   font-display: swap;
 }
 
-/* PromptVault extension — dark-first, amber accent (see design system).
+/* InjectKit extension — dark-first, amber accent (see design system).
    Variables on :root, html, and body so they always resolve in the popup document
    (Plasmo popup is not shadow-DOM; missing inheritance was causing unset vars). */
 @layer base {

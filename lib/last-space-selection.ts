@@ -1,7 +1,7 @@
 import { getToken, getUser, getUserIdFromToken } from "./auth"
 
 /**
- * Stable id for namespacing local preferences (matches stored `promptvault:user`.id and JWT `userId`).
+ * Stable id for namespacing local preferences (matches stored `injectkit:user`.id and JWT `userId`).
  */
 export async function getSessionIdentityForStorage(): Promise<string | null> {
   const user = await getUser()

@@ -26,7 +26,7 @@ yarn-error.log*
 out/
 build/
 dist/
-promptvault-extension.zip
+injectkit-extension.zip
 
 # plasmo
 .plasmo

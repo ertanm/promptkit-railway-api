@@ -40,14 +40,14 @@ export function renderBillingSuccessHtml(): string {
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Subscription updated — PromptVault</title>
+  <title>Subscription updated — InjectKit</title>
   <style>
     body { font-family: system-ui, sans-serif; max-width: 28rem; margin: 4rem auto; padding: 0 1rem; text-align: center; }
   </style>
 </head>
 <body>
   <h1>Thank you</h1>
-  <p>Your subscription was updated. You can close this tab and return to PromptVault.</p>
+  <p>Your subscription was updated. You can close this tab and return to InjectKit.</p>
 </body>
 </html>`
 }
@@ -58,14 +58,14 @@ export function renderBillingCancelHtml(): string {
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Checkout canceled — PromptVault</title>
+  <title>Checkout canceled — InjectKit</title>
   <style>
     body { font-family: system-ui, sans-serif; max-width: 28rem; margin: 4rem auto; padding: 0 1rem; text-align: center; }
   </style>
 </head>
 <body>
   <h1>Checkout canceled</h1>
-  <p>No charges were made. You can try again anytime from PromptVault.</p>
+  <p>No charges were made. You can try again anytime from InjectKit.</p>
 </body>
 </html>`
 }
