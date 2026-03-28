@@ -3,12 +3,10 @@
 import "dotenv/config"
 import { defineConfig } from "prisma/config"
 
-const url = process.env.DATABASE_URL
-if (!url || url.trim() === "") {
-  throw new Error(
-    "DATABASE_URL is not set. In Railway: Variables → + New Variable → Add Reference → [Select your Postgres service] → DATABASE_URL"
-  )
-}
+// During Docker build, DATABASE_URL isn't available — prisma generate doesn't
+// need it, so we fall back to an empty string.  At runtime (start.sh),
+// DATABASE_URL is always injected by Railway.
+const url = process.env.DATABASE_URL ?? ""
 
 export default defineConfig({
   schema: "prisma/schema.prisma",
